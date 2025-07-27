@@ -18,7 +18,7 @@ export interface MediaItem {
 
 export interface ProductData {
   title: string;
-  description: string; // This is an HTML string
+  description: string; 
   media: MediaItem[];
   checklist: ChecklistItem[];
   cta_text: {
