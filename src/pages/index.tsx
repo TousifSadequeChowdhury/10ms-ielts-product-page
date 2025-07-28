@@ -40,6 +40,8 @@ const HomePage: NextPage<PageProps> = ({ product, lang }) => {
       <Head>
         <title>{Array.isArray(product.seo) ? product.title : product.seo.title}</title>
         <meta name="description" content={Array.isArray(product.seo) ? '' : product.seo.description} />
+            <link rel="icon" href="/public/tenminfavicon.png" />
+
       </Head>
 
       <div className="text-center py-2 bg-gray-100">
