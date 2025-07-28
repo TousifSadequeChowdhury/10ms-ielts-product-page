@@ -11,20 +11,29 @@ import Checklist from '../components/Checklist';
 import Features from '../components/Features';
 import About from '../components/About';
 import CTA from '../components/CTA';
-import ExclusiveFeatures from '../components/ExclusiveFeatures'; // Import the new component
+import ExclusiveFeatures from '../components/ExclusiveFeatures';
+import Offers from '../components/Offers';
+import GroupJoin from '../components/GroupJoin';
+import Testimonials from '../components/Testimonials';
+import Faq from '../components/Faq';
 
+// Define the props for the page component
 interface PageProps {
   product: ProductData;
   lang: 'en' | 'bn';
 }
 
 const HomePage: NextPage<PageProps> = ({ product, lang }) => {
-  // ... (the code to find sections remains the same)
-  const featuresSection = product.sections.find((s) => s.type === 'features');
-  const instructorSection = product.sections.find((s) => s.type === 'instructors');
-  const pointersSection = product.sections.find((s) => s.type === 'pointers');
-  const exclusiveFeatureSection = product.sections.find((s) => s.type === 'feature_explanations');
-  const aboutSection = product.sections.find((s) => s.type === 'about');
+  // Find all sections from the API, checking if they have content
+  const offersSection = product.sections.find((s) => s.type === 'offers' && s.values.length > 0);
+  const instructorSection = product.sections.find((s) => s.type === 'instructors' && s.values.length > 0);
+  const featuresSection = product.sections.find((s) => s.type === 'features' && s.values.length > 0);
+  const groupJoinSection = product.sections.find((s) => s.type === 'group_join_engagement' && s.values.length > 0);
+  const pointersSection = product.sections.find((s) => s.type === 'pointers' && s.values.length > 0);
+  const exclusiveFeatureSection = product.sections.find((s) => s.type === 'feature_explanations' && s.values.length > 0);
+  const testimonialsSection = product.sections.find((s) => s.type === 'testimonials' && s.values.length > 0);
+  const aboutSection = product.sections.find((s) => s.type === 'about' && s.values.length > 0);
+  const faqSection = product.sections.find((s) => s.type === 'faq' && s.values.length > 0);
 
   return (
     <>
@@ -40,18 +49,21 @@ const HomePage: NextPage<PageProps> = ({ product, lang }) => {
       </div>
 
       <main className="container mx-auto p-4">
-        {/* ADD THE key={lang} PROP TO THIS DIV */}
         <div className="flex flex-col md:flex-row md:gap-8" key={lang}>
           
           {/* Left Column (Main Content) */}
           <div className="w-full md:w-2/3">
             <h1 className="text-4xl font-bold">{product.title}</h1>
-            <div className="prose mt-4" dangerouslySetInnerHTML={{ __html: product.description }} />
+            <div className="prose mt-4 max-w-none" dangerouslySetInnerHTML={{ __html: product.description }} />
+            {offersSection && <Offers section={offersSection} />}
             {instructorSection && <Instructors section={instructorSection} />}
             {featuresSection && <Features section={featuresSection} />}
+            {groupJoinSection && <GroupJoin section={groupJoinSection} />}
             {pointersSection && <Pointers section={pointersSection} />}
             {exclusiveFeatureSection && <ExclusiveFeatures section={exclusiveFeatureSection} />}
+            {testimonialsSection && <Testimonials section={testimonialsSection} />}
             {aboutSection && <About section={aboutSection} />}
+            {faqSection && <Faq section={faqSection} />}
           </div>
 
           {/* Right Column (Sidebar) */}
@@ -80,7 +92,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     );
 
-    // If the response from the server is not OK, something went wrong
     if (!res.ok) {
         throw new Error(`Failed to fetch API: ${res.status}`);
     }
@@ -88,18 +99,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const apiResponse = await res.json();
     const product: ProductData = apiResponse.data;
 
-    // If the API returns no data for the product
     if (!product) {
       return { notFound: true };
     }
     
-    // Success case: return the props
     return { props: { product, lang } };
 
   } catch (error) {
-    // Catch any error during the try block (e.g., network error)
     console.error("Error in getServerSideProps:", error);
-    // Return a 404 page to prevent the app from crashing
     return { notFound: true };
   }
 };

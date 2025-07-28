@@ -4,10 +4,10 @@ import { Section } from '../types/product';
 
 const Instructors: React.FC<{ section: Section }> = ({ section }) => (
   <section className="my-12 p-6 bg-gray-100 rounded-lg">
-    <h2 className="text-3xl font-bold text-center mb-6">{section.name}</h2>
+    <h2 className="text-3xl font-bold text-center mb-6 text-gray-900">{section.name}</h2>
     <div className="flex flex-wrap justify-center gap-8">
       {section.values.map((instructor: any) => (
-        <div key={instructor.name} className="text-center w-48">
+        <div key={instructor.name} className="text-center w-48 text-[#ec2829]">
           <img
             src={instructor.image}
             alt={instructor.name}
