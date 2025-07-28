@@ -22,7 +22,7 @@ export interface ProductData {
   media: MediaItem[];
   checklist: ChecklistItem[];
   cta_text: {
-    name: string; // This is the CTA text
+    name: string; 
     value: string;
   };
   sections: Section[];

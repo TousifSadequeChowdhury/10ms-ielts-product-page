@@ -1,8 +1,9 @@
-// src/pages/index.tsx
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ProductData } from '../types/product';
+
+// Import all your created components
 import Trailer from '../components/Trailer';
 import Instructors from '../components/Instructors';
 import Pointers from '../components/Pointers';
@@ -10,6 +11,7 @@ import Checklist from '../components/Checklist';
 import Features from '../components/Features';
 import About from '../components/About';
 import CTA from '../components/CTA';
+import ExclusiveFeatures from '../components/ExclusiveFeatures'; // Import the new component
 
 interface PageProps {
   product: ProductData;
@@ -17,9 +19,11 @@ interface PageProps {
 }
 
 const HomePage: NextPage<PageProps> = ({ product, lang }) => {
-  const featuresSection = product.sections.find((s) => s.type === 'features');
+  // Find all the sections we need from the API response
   const instructorSection = product.sections.find((s) => s.type === 'instructors');
+  const featuresSection = product.sections.find((s) => s.type === 'features');
   const pointersSection = product.sections.find((s) => s.type === 'pointers');
+  const exclusiveFeatureSection = product.sections.find((s) => s.type === 'feature_explanations');
   const aboutSection = product.sections.find((s) => s.type === 'about');
 
   return (
@@ -35,31 +39,41 @@ const HomePage: NextPage<PageProps> = ({ product, lang }) => {
         <Link href="/?lang=en" className={`p-2 ${lang === 'en' ? 'font-bold text-green-600' : ''}`}>English</Link>
       </div>
 
-      <main className="container mx-auto p-4 pb-28">
-        <h1 className="text-4xl font-bold">{product.title}</h1>
-        <div className="prose mt-4" dangerouslySetInnerHTML={{ __html: product.description }} />
-        <Checklist items={product.checklist} />
-        {featuresSection && <Features section={featuresSection} />}
-        <Trailer media={product.media} />
-        {instructorSection && <Instructors section={instructorSection} />}
-        {pointersSection && <Pointers section={pointersSection} />}
-        {aboutSection && <About section={aboutSection} />}
+      <main className="container mx-auto p-4">
+        {/* Main layout container using Flexbox */}
+        <div className="flex flex-col md:flex-row md:gap-8">
+          
+          {/* Left Column (Main Content) */}
+          <div className="w-full md:w-2/3">
+            <h1 className="text-4xl font-bold">{product.title}</h1>
+            <div className="prose mt-4" dangerouslySetInnerHTML={{ __html: product.description }} />
+            {instructorSection && <Instructors section={instructorSection} />}
+            {featuresSection && <Features section={featuresSection} />}
+            {pointersSection && <Pointers section={pointersSection} />}
+            {exclusiveFeatureSection && <ExclusiveFeatures section={exclusiveFeatureSection} />}
+            {aboutSection && <About section={aboutSection} />}
+          </div>
+
+          {/* Right Column (Sidebar) */}
+          <div className="w-full md:w-1/3 md:sticky md:top-4 h-fit space-y-4 mt-8 md:mt-0">
+            <Trailer media={product.media} />
+            <CTA text={product.cta_text.name} />
+            <Checklist items={product.checklist} />
+          </div>
+
+        </div>
       </main>
-      
-      <CTA text={product.cta_text.name} />
     </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const lang = context.query.lang === 'bn' ? 'bn' : 'en'; [cite: 6, 8]
+  const lang = context.query.lang === 'bn' ? 'bn' : 'en';
 
   const res = await fetch(
-    `https://api.10minuteschool.com/discovery-service/api/v1/products/ielts-course?lang=${lang}`, [cite: 7]
+    `https://api.10minuteschool.com/discovery-service/api/v1/products/ielts-course?lang=${lang}`,
     {
-      headers: {
-        'X-TENMS-SOURCE-PLATFORM': 'web', [cite: 9]
-      },
+      headers: { 'X-TENMS-SOURCE-PLATFORM': 'web' },
     }
   );
 
