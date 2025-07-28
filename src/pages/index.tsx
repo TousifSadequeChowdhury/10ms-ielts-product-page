@@ -19,9 +19,9 @@ interface PageProps {
 }
 
 const HomePage: NextPage<PageProps> = ({ product, lang }) => {
-  // Find all the sections we need from the API response
-  const instructorSection = product.sections.find((s) => s.type === 'instructors');
+  // ... (the code to find sections remains the same)
   const featuresSection = product.sections.find((s) => s.type === 'features');
+  const instructorSection = product.sections.find((s) => s.type === 'instructors');
   const pointersSection = product.sections.find((s) => s.type === 'pointers');
   const exclusiveFeatureSection = product.sections.find((s) => s.type === 'feature_explanations');
   const aboutSection = product.sections.find((s) => s.type === 'about');
@@ -40,8 +40,8 @@ const HomePage: NextPage<PageProps> = ({ product, lang }) => {
       </div>
 
       <main className="container mx-auto p-4">
-        {/* Main layout container using Flexbox */}
-        <div className="flex flex-col md:flex-row md:gap-8">
+        {/* ADD THE key={lang} PROP TO THIS DIV */}
+        <div className="flex flex-col md:flex-row md:gap-8" key={lang}>
           
           {/* Left Column (Main Content) */}
           <div className="w-full md:w-2/3">
@@ -68,21 +68,40 @@ const HomePage: NextPage<PageProps> = ({ product, lang }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const lang = context.query.lang === 'bn' ? 'bn' : 'en';
+  try {
+    const lang = context.query.lang === 'bn' ? 'bn' : 'en';
 
-  const res = await fetch(
-    `https://api.10minuteschool.com/discovery-service/api/v1/products/ielts-course?lang=${lang}`,
-    {
-      headers: { 'X-TENMS-SOURCE-PLATFORM': 'web' },
+    const res = await fetch(
+      `https://api.10minuteschool.com/discovery-service/api/v1/products/ielts-course?lang=${lang}`,
+      {
+        headers: {
+          'X-TENMS-SOURCE-PLATFORM': 'web',
+        },
+      }
+    );
+
+    // If the response from the server is not OK, something went wrong
+    if (!res.ok) {
+        throw new Error(`Failed to fetch API: ${res.status}`);
     }
-  );
 
-  const apiResponse = await res.json();
-  const product: ProductData = apiResponse.data;
+    const apiResponse = await res.json();
+    const product: ProductData = apiResponse.data;
 
-  if (!product) { return { notFound: true }; }
-  
-  return { props: { product, lang } };
+    // If the API returns no data for the product
+    if (!product) {
+      return { notFound: true };
+    }
+    
+    // Success case: return the props
+    return { props: { product, lang } };
+
+  } catch (error) {
+    // Catch any error during the try block (e.g., network error)
+    console.error("Error in getServerSideProps:", error);
+    // Return a 404 page to prevent the app from crashing
+    return { notFound: true };
+  }
 };
 
 export default HomePage;
